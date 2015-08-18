@@ -3,9 +3,9 @@
  * Libraries Datatables ServerSide For CodeIgniter
  * August 2015
  * @link http://github.com/hikmahtiar6/DatatablesCodeIgniterLibrary
- * @version 1.0.0
+ * @version 0.2
  * @author HikmahTiar <hikmahtiar.cool@gmail.com>
- * @license HT --- http://hikmahtiar6.github.io
+ * @license MIT --- http://hikmahtiar6.github.io
  */
 class Datatables {
 	protected $ci;
