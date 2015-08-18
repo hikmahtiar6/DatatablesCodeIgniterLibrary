@@ -4,7 +4,6 @@
 
 This library used **Datatables 1.10+** , library is designed to facilitate making Datatables Server Side.
 
-----------
 ## **Version**
 ----------------------
 #### **0.1 - Initial Release**
