@@ -7,6 +7,7 @@ This library used **Datatables 1.10+** , library is designed to facilitate makin
 ## **Quick Start**
 Example Zero Configuration
 ###### index.php
+```
     <html>
 	    <head>
 		    <title>Datatables Serverside</title
@@ -28,6 +29,7 @@ Example Zero Configuration
 		    </table>
 	    </body>
     </html>
+```
 
 ## **Version**
 #### **0.2**
@@ -42,7 +44,7 @@ Example Zero Configuration
  - Generate One Table
 
 ####Author
-HikmahTiar  : <hikmahtiar.cool@gmail.com>
-Version 0.2
+
+ - HikmahTiar  : <hikmahtiar.cool@gmail.com>
 
 To be continued....
