@@ -32,6 +32,11 @@ Example Zero Configuration
 ```
 
 ## **Version**
+#### **1.0 Beta 1**
+ - Cleaning SourceCode
+ - Change Array assoc on columns field table
+ - Generate data with search custom field table
+
 #### **0.2**
  - Generate Custom (change not included Numbering Column)
  - Generate Join Table
