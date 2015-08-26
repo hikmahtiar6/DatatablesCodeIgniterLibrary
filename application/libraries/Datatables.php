@@ -1,311 +1,211 @@
 <?php
 /**
  * Libraries Datatables ServerSide For CodeIgniter
- * August 2015
+ * Started August 18, 2015
+ * @todo Cleaning Source Code
  * @link http://github.com/hikmahtiar6/DatatablesCodeIgniterLibrary
- * @version 0.2
+ * @version 1.0 Beta 1
  * @author HikmahTiar <hikmahtiar.cool@gmail.com>
- * @license MIT --- http://hikmahtiar6.github.io
+ * @license MIT
+ *
  */
 class Datatables {
+
+	/**
+	 * @var $ci for get_instance() CodeIgniter;
+	 */
 	protected $ci;
 
 	/**
-	 * This function for get recored one table
-	 * @param num_rows int
+	 * This Function for GET QUERY
+	 * @param string $table is table used
+	 * @param string $select Checking > running query select
+	 * @param array $join Checking > If not null , running query JOIN TABLE of $join = array()
+	 * @return string $query
 	 */
-	private function _get_rows_all($table, $select)
+	private function _query_select_table($table, $select, array $join)
 	{
 		$this->ci =& get_instance();
 
 		$sql = $this->ci->db;
 
-		($select == '') ? $query = $sql->select('*') :  $query = $sql->select($select);	
-		$query = $sql->from($table);
-		$get = $sql->get();
-		$num_rows = $get->num_rows();
-
-		return $num_rows;
-	}
-
-	/**
-	 * This function for get record join table
-	 * @param num_rows int
-	 */
-	private function _get_rows_all_join($table, $select, $join)
-	{
-		$this->ci =& get_instance();
-
-		$sql = $this->ci->db;
-
-		($select == '') ? $query = $sql->select('*') :  $query = $sql->select($select);	
-		$query = $sql->from($table);
-
-		foreach($join as $joined => $val)
+		if($select == '')
 		{
-			$query = $sql->join($joined, $val['on'], $val['condition']);
-		}
-
-		$get = $sql->get();
-		$num_rows = $get->num_rows();
-
-		return $num_rows;
-	}
-
-	/**
-	 * This function get filter data one table
-	 * @param num_rows int
-	 */
-	private function _get_filter($table, $select, $columns, $search_column)
-	{
-		$this->ci =& get_instance();
-
-		$sql = $this->ci->db;
-
-		$request = $_REQUEST;
-
-		($select == '') ? $query = $sql->select('*') :  $query = $sql->select($select);
-		$query = $sql->from($table);
-		//$query = $sql->where('1=1');
-
-		if($request['search']['value'] != '')
+			$query = $sql->select('*');
+		} 
+		else
 		{
-			$query_search = '(';
-			$searching = '';
-
-			if($search_column == '')
-			{
-				foreach($columns as $col => $col_val)
-				{
-					$searching .= ' '.$col_val.' LIKE '.'"%'.$request['search']['value'].'%" OR';
-				}
-			}
-			else
-			{
-				foreach($search_column as $col)
-				{
-					$searching .= ' '.$col.' LIKE '.'"%'.$request['search']['value'].'%" OR';
-				}
-				
-			}
-
-			$query_search .= rtrim($searching, 'OR');
-			$query_search .= ')';
-			$query = $sql->where($query_search);
-		}
-
-		$get = $query->get();
-		$filtered = $get->num_rows();
-
-		return $filtered;
-	}
-
-	/**
-	 * This function for get filter data JOIN table
-	 * @param num_rows int
-	 */
-	private function _get_filter_join($table, $select, $columns, $search_column, $join)
-	{
-		$this->ci =& get_instance();
-
-		$sql = $this->ci->db;
-
-		$request = $_REQUEST;
-
-		($select == '') ? $query = $sql->select('*') :  $query = $sql->select($select);
-		$query = $sql->from($table);
-
-		foreach($join as $joined => $val)
-		{
-			$query = $sql->join($joined, $val['on'], $val['condition']);
-		}
-
-		//$query = $sql->where('1=1');
-
-		if($request['search']['value'] != '')
-		{
-			$query_search = '(';
-			$searching = '';
-
-			if($search_column == '')
-			{
-				foreach($columns as $col => $col_val)
-				{
-					$searching .= ' '.$col_val.' LIKE '.'"%'.$request['search']['value'].'%" OR';
-				}
-			}
-			else
-			{
-				foreach($search_column as $col)
-				{
-					$searching .= ' '.$col.' LIKE '.'"%'.$request['search']['value'].'%" OR';
-				}
-				
-			}
-
-			$query_search .= rtrim($searching, 'OR');
-			$query_search .= ')';
-			$query = $sql->where($query_search);
-		}
-
-		$get = $query->get();
-		$filtered = $get->num_rows();
-
-		return $filtered;
-	}
-
-	/**
-	 * This function for get data one table
-	 * @param data Array
-	 */
-	private function _get_data($table, $select, $columns, $search_column)
-	{
-		$this->ci =& get_instance();
-
-		$sql = $this->ci->db;
-
-		$request = $_REQUEST;
-
-		($select == '') ? $query2 = $sql->select('*') :  $query2 = $sql->select($select);
-		$query2 = $sql->from($table);
-		//$query2 = $sql->where('1=1');
-
-		if($request['search']['value'] != '')
-		{
-			$query_search = '(';
-			$searching = '';
-
-			if($search_column == '')
-			{
-				foreach($columns as $col => $col_val)
-				{
-					$searching .= ' '.$col_val.' LIKE '.'"%'.$request['search']['value'].'%" OR';
-				}
-			}
-			else
-			{
-				foreach($search_column as $col)
-				{
-					$searching .= ' '.$col.' LIKE '.'"%'.$request['search']['value'].'%" OR';
-				}
-				
-			}
-
-			$query_search .= rtrim($searching, 'OR');
-			$query_search .= ')';
-			$query2 = $sql->where($query_search);
-		}
-				
-		$query2->limit($request['length'] , $request['start']);
-		$query2->order_by($columns[$request['order'][0]['column']] , $request['order'][0]['dir']);
-		$get = $query2->get();
-
-		return $get->result_array();
-	}
-
-	/**
-	 * This function for get data one table
-	 * @param data Array
-	 */
-	private function _get_data_join($table, $select, $columns, $search_column, $join)
-	{
-		$this->ci =& get_instance();
-
-		$sql = $this->ci->db;
-
-		$request = $_REQUEST;
-
-		($select == '') ? $query2 = $sql->select('*') :  $query2 = $sql->select($select);
-		$query2 = $sql->from($table);
-
-		foreach($join as $joined => $val)
-		{
-			$query2 = $sql->join($joined, $val['on'], $val['condition']);
-		}
-
-		//$query2 = $sql->where('1=1'); 
-
-		if($request['search']['value'] != '')
-		{
-			$query_search = '(';
-			$searching = '';
-
-			if($search_column == '')
-			{
-				foreach($columns as $col => $col_val)
-				{
-					$searching .= ' '.$col_val.' LIKE '.'"%'.$request['search']['value'].'%" OR';
-				}
-			}
-			else
-			{
-				foreach($search_column as $col)
-				{
-					$searching .= ' '.$col.' LIKE '.'"%'.$request['search']['value'].'%" OR';
-				}
-				
-			}
-
-			$query_search .= rtrim($searching, 'OR');
-			$query_search .= ')';
-			$query2 = $sql->where($query_search);
+			$query = $sql->select($select);	
 		}
 		
-		$query2->limit($request['length'] , $request['start']);
-		$query2->order_by($columns[$request['order'][0]['column']] , $request['order'][0]['dir']);
-		$get = $query2->get();
+		$query = $sql->from($table);
+
+		if(count($join) > 0)
+		{
+			foreach($join as $key_join => $val_join)
+			{
+				$query = $sql->join($key_join, $val_join['on'], $val_join['condition']);
+			}
+		}
+
+		return $query;
+
+	}
+
+	/**
+	 * This Function for Get value rows ALL DATA TABLE
+	 * @param $table, $select, $join in function _query_select_table()
+	 * @return int $num_rows
+	 */
+	private function _get_rows_all_data($table, $select, $join)
+	{
+		$this->ci =& get_instance();
+
+		$sql = $this->ci->db;
+		
+		$query = $this->_query_select_table($table, $select, $join);
+
+		$get = $query->get();
+
+		$num_rows = $get->num_rows();
+		
+		//var_dump($query);
+
+		return $num_rows;
+	}
+
+	/**
+	 * This Function for Get Value Rows Filtered Data Table
+	 * @param $table, $select, $join in function _query_select_table()
+	 * @param array $columns > variable column used
+	 * @param array $search_columns > if used customized search
+	 * @var $request_search > Request string of Datatables
+	 * @var $query_search > running QUERY SEARCH DATA
+	 * @return int $filtered
+	 */
+	private function _get_rows_filter_data($table, $select, $join, array $columns, array $search_columns)
+	{
+		$this->ci =& get_instance();
+
+		$sql = $this->ci->db;
+		
+		$query = $this->_query_select_table($table, $select, $join);
+
+		$request_search = $_REQUEST['search']['value'];
+
+		if($request_search != '')
+		{
+			$query_search = '(';
+			$searching = '';
+
+			if(count($search_columns) > 0)
+			{
+				foreach($columns as $key_column => $val_column)
+				{
+					$searching .= ' '.$val_column.' LIKE '.'"%'.$request_search.'%" OR';
+				}
+			}
+			else
+			{
+				foreach($search_columns as $key_search_column)
+				{
+					$searching .= ' '.$key_search_column.' LIKE '.'"%'.$request_search.'%" OR';
+				}
+				
+			}
+
+			$query_search .= rtrim($searching, 'OR');
+			$query_search .= ')';
+			$query = $sql->where($query_search);
+		}
+
+		$get = $query->get();
+		$filtered = $get->num_rows();
+
+		return $filtered;
+	}
+
+	/**
+	 * This Function for Get Value Rows Filtered Data Table used
+	 * @param $table, $select, $join in function _query_select_table()
+	 * @param array $columns > variable column used
+	 * @param array $search_columns > if used customized search
+	 * @var $request_search > Request string of Datatables
+	 * @var $query_search > running QUERY SEARCH DATA
+	 * @var order_table > available Request Order of Datatables
+	 * @return Array
+	 */
+	private function _get_rows_filter_order_limit_data($table, $select, $join, $columns, $search_columns)
+	{
+		$this->ci =& get_instance();
+
+		$sql = $this->ci->db;
+		
+		$query = $this->_query_select_table($table, $select, $join);
+
+		$request_search = $_REQUEST['search']['value'];
+
+		if($request_search != '')
+		{
+			$query_search = '(';
+			$searching = '';
+
+			if($search_columns == '')
+			{
+				foreach($columns as $key_column => $val_column)
+				{
+					$searching .= ' '.$val_column.' LIKE '.'"%'.$request_search.'%" OR';
+				}
+			}
+			else
+			{
+				foreach($search_columns as $key_search_column)
+				{
+					$searching .= ' '.$key_search_column.' LIKE '.'"%'.$request_search.'%" OR';
+				}
+				
+			}
+
+			$query_search .= rtrim($searching, 'OR');
+			$query_search .= ')';
+			$query = $sql->where($query_search);
+		}
+				
+		$query->limit($_REQUEST['length'] , $_REQUEST['start']);
+
+		$order_column = $_REQUEST['columns'];
+		$order_table = $_REQUEST['order'];
+
+        foreach($order_table as $val_order)
+        {
+			$order__ = $_REQUEST['columns'][$val_order['column']]['data'];
+            $query->order_by($order__ , $val_order['dir']);
+        }
+
+		$get = $query->get();
 
 		return $get->result_array();
 	}
 
 	/**
-	 * This function for generate Datatables
+	 * This Function for Get Value Rows Filtered Data Table used
+	 * @param $table, $select, $join in function _query_select_table()
+	 * @var $rows_all > int num_rows all data
+	 * @var $filtered > int num_rows filtered data
+	 * @var $get > array for JSON of Datatables ServerSide 
+	 * @return Array
 	 */
-	public function generate($table, $select = '', $columns, $search_column = '', $search_custom = '',  $join = '')
+	public function generate($table, $select= '', $join = '', $columns, $search_columns = '', $search_custom = '')
 	{
 		$this->ci =& get_instance();
 
-		// $sql is variable $this->db
-		// then, $sql used for functions that use $this->db ($this->db replaced with $sql)
 		$sql = $this->ci->db;
 
-		$request = $_REQUEST;
+		$rows_all = $this->_get_rows_all_data($table, $select, $join);
 
-		// get num_rows all data in table used
-		// get filtered on data showing
+		$filtered = $this->_get_rows_filter_data($table, $select, $join, $columns, $search_columns);
 
-		if($join == '')
-		{
-			$rows_all = $this->_get_rows_all($table, $select);
-			if($search_custom == '')
-			{
-				$filtered = $this->_get_filter($table, $select, $columns, $search_column, $search_custom);
-				$get = $this->_get_data($table, $select, $columns, $search_column, $search_custom);
-			}
-			else
-			{
-				
-				$filtered = $search_custom['filtered'];
-				$get = $search_custom['get'];
-				
-			}
-		} 
-		else
-		{
-			$rows_all = $this->_get_rows_all_join($table, $select, $join); 
-			if($search_custom == '')
-			{
-				$filtered = $this->_get_filter_join($table, $select, $columns, $search_column, $search_custom, $join);
-				$get = $this->_get_data_join($table, $select, $columns, $search_column, $search_custom, $join);
-			}
-			else
-			{
-				
-				$filtered = $search_custom['filtered'];
-				$get = $search_custom['get'];
-				
-			}
-		}
+		$get = $this->_get_rows_filter_order_limit_data($table, $select, $join, $columns, $search_columns);
 
 		$data = [];
 
@@ -313,19 +213,19 @@ class Datatables {
 		{
 			$dt = [];
 
-			foreach($columns as $col)
+			foreach($columns as $key_column => $val_column)
 			{
-				if(strpos($col, '.') !== FALSE)
+				if(strpos($val_column, '.') !== FALSE)
 				{
-					$cl = explode('.', $col);
-					$dt[] = [
+					$cl = explode('.', $val_column);
+					$dt[$key_column] = [
 						$row[$cl[1]]
 					];
 				}
 				else
 				{
-					$dt[] = [
-						$row[$col]
+					$dt[$key_column] = [
+						$row[$val_column]
 					];
 				}
 			}
@@ -335,7 +235,7 @@ class Datatables {
 
 		$json = [
 
-			'draw' => intval($request['draw']),
+			'draw' => intval($_REQUEST['draw']),
 			'recordsTotal' => intval($rows_all),
 			'recordsFiltered' => intval($filtered),
 			'data' => $data
@@ -344,121 +244,4 @@ class Datatables {
 
 		return $json;
 	}
-
-	/**
-	 * This function for generate with Column Number Datatables
-	 */
-	public function generate_with_numbering($table, $select = '', $columns, $search_column = '', $search_custom = '',  $join = '')
-	{
-		$this->ci =& get_instance();
-
-		// $sql is variable $this->db
-		// then, $sql used for functions that use $this->db ($this->db replaced with $sql)
-		$sql = $this->ci->db;
-
-		$request = $_REQUEST;
-
-		$no = 0;
-		// get num_rows all data in table used
-		// get filtered on data showing
-
-		if($join == '')
-		{
-			$rows_all = $this->_get_rows_all($table, $select);
-			if($search_custom == '')
-			{
-				$filtered = $this->_get_filter($table, $select, $columns, $search_column, $search_custom);
-				$get = $this->_get_data($table, $select, $columns, $search_column, $search_custom);
-			}
-			else
-			{
-				$filtered = $search_custom['filtered'];
-				$get = $search_custom['get'];
-			}
-		} 
-		else
-		{
-			$rows_all = $this->_get_rows_all_join($table, $select, $join); 
-			if($search_custom == '')
-			{
-				$filtered = $this->_get_filter_join($table, $select, $columns, $search_column, $search_custom, $join);
-				$get = $this->_get_data_join($table, $select, $columns, $search_column, $search_custom, $join);
-			}
-			else
-			{
-				$filtered = $search_custom['filtered'];
-				$get = $search_custom['get'];
-				
-			}
-		}
-
-		$data = [];
-
-		foreach($get as $row)
-		{
-			$dt = [];
-
-			$dt[] = $no + ($request['start'] + 1);
-			foreach($columns as $col)
-			{
-				if(strpos($col, '.') !== FALSE)
-				{
-					$cl = explode('.', $col);
-					$dt[] = [
-						$row[$cl[1]]
-					];
-				}
-				else
-				{
-					$dt[] = [
-						$row[$col]
-					];
-				}
-			}
-
-			$no++;
-			$data[] = $dt;
-		}
-
-		$json = [
-
-			'draw' => intval($request['draw']),
-			'recordsTotal' => intval($rows_all),
-			'recordsFiltered' => intval($filtered),
-			'data' => $data
-
-		];
-
-		return $json;
-	}
-
-	/*public function simple_dt()
-	{
-		$qq = 'SELECT * FROM test WHERE 1=1 ';
-
-		if($request['search']['value'] != '')
-		{
-			$qq .= ' AND ( ';
-			$hasil = '';
-			foreach($column as $col)
-			{
-				$hasil .= rtrim(' '.$col.' LIKE '.'"%'.$request['search']['value'].'%" OR ');
-			}
-			$qq .= rtrim($hasil, 'OR');
-			$qq .= ')';
-		}
-
-
-		$get = $sql->query($qq);
-		$filtered = $get->num_rows();
-		if($request['order'][0]['column'] > 0)
-		{
-			$qq .= 'ORDER BY '.$column[$request['order'][0]['column']].' '.$request['order'][0]['dir'];
-		}
-
-		$qq .= ' LIMIT '.$request['start'].' , '.$request['length'] ;
-
-		$get = $sql->query($qq);
-	}
-	*/
 }
