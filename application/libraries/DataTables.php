@@ -46,7 +46,7 @@ class DataTables {
     }
 
     /**
-     * Function for GET QUERY
+     * Function for GET QUERY.
      *
      * @param string $table as table used
      * @param string $select Checking > running query select
@@ -102,12 +102,11 @@ class DataTables {
     }
 
     /**
-     * Function for Get Value Rows Filtered Data Table
+     * Function for Get Value Rows Filtered Data Table.
+     *
      * @param $table, $select, $join in function _query_select_table()
      * @param array $columns > variable column used
      * @param array $search_columns > if used customized search
-     * @var $request_search > Request string of Datatables
-     * @var $query_search > running QUERY SEARCH DATA
      * @return int $filtered
      */
     private function _get_rows_filter_data($table, $select, $join, array $columns, array $search_columns)
@@ -151,13 +150,11 @@ class DataTables {
     }
 
     /**
-     * Function for Get Value Rows Filtered Data Table used
+     * Function for Get Value Rows Filtered Data Table used.
+     *
      * @param $table, $select, $join in function _query_select_table()
      * @param array $columns > variable column used
      * @param array $search_columns > if used customized search
-     * @var $request_search > Request string of Datatables
-     * @var $query_search > running QUERY SEARCH DATA
-     * @var order_table > available Request Order of Datatables
      * @return Array
      */
     private function _get_rows_filter_order_limit_data($table, $select, $join, $columns, $search_columns)
@@ -212,11 +209,9 @@ class DataTables {
     }
 
     /**
-     * Function for Get Value Rows Filtered Data Table used
+     * Function for Get Value Rows Filtered Data Table used.
+     *
      * @param $table, $select, $join in function _query_select_table()
-     * @var $rows_all > int num_rows all data
-     * @var $filtered > int num_rows filtered data
-     * @var $get > array for JSON of Datatables ServerSide 
      * @return Array
      */
     public function generate($table, $select= '', $join = [], $columns, $search_columns = [], $search_custom = [], $view_custom = [])
@@ -276,9 +271,9 @@ class DataTables {
     }
 
     /**
-     * Function for checking string column
+     * Function for checking string column.
+     *
      * @param string $string
-     * @var $str as return string exploded
      * @return string $string
      */
     private function checking_string($string)
