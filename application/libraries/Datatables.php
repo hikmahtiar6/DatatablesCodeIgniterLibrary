@@ -2,13 +2,21 @@
 /**
  * Libraries Datatables ServerSide For CodeIgniter
  * Started August 18, 2015
- * @todo Cleaning Source Code
- * @link http://github.com/hikmahtiar6/DatatablesCodeIgniterLibrary
- * @version 1.0 Beta 1
+ * @link https://github.com/hikmahtiar6
+ * @version 1.1
  * @author HikmahTiar <hikmahtiar.cool@gmail.com>
  * @license MIT
  *
  */
+
+/******************************
+ * Facebook : Hikmah Tiar     *
+ * Twitter : @hikmahtiar_     *
+ * Instagram : @hikmahtiar6   *
+ * Contact : 0878-7430-5327   *
+ ******************************
+ */
+
 class Datatables {
 
 	/**
@@ -17,13 +25,13 @@ class Datatables {
 	protected $ci;
 
 	/**
-	 * This Function for GET QUERY
-	 * @param string $table is table used
+	 * Function for GET QUERY
+	 * @param string $table as table used
 	 * @param string $select Checking > running query select
 	 * @param array $join Checking > If not null , running query JOIN TABLE of $join = array()
 	 * @return string $query
 	 */
-	private function _query_select_table($table, $select, array $join)
+	public function _query_select_table($table, $select, array $join)
 	{
 		$this->ci =& get_instance();
 
@@ -53,7 +61,7 @@ class Datatables {
 	}
 
 	/**
-	 * This Function for Get value rows ALL DATA TABLE
+	 * Function for Get value rows ALL DATA TABLE
 	 * @param $table, $select, $join in function _query_select_table()
 	 * @return int $num_rows
 	 */
@@ -75,7 +83,7 @@ class Datatables {
 	}
 
 	/**
-	 * This Function for Get Value Rows Filtered Data Table
+	 * Function for Get Value Rows Filtered Data Table
 	 * @param $table, $select, $join in function _query_select_table()
 	 * @param array $columns > variable column used
 	 * @param array $search_columns > if used customized search
@@ -126,7 +134,7 @@ class Datatables {
 	}
 
 	/**
-	 * This Function for Get Value Rows Filtered Data Table used
+	 * Function for Get Value Rows Filtered Data Table used
 	 * @param $table, $select, $join in function _query_select_table()
 	 * @param array $columns > variable column used
 	 * @param array $search_columns > if used customized search
@@ -178,7 +186,8 @@ class Datatables {
 
         foreach($order_table as $val_order)
         {
-			$order__ = $_REQUEST['columns'][$val_order['column']]['data'];
+        	$ordering = $_REQUEST['columns'][$val_order['column']]['data'];
+			$order__ = $columns[$ordering];
             $query->order_by($order__ , $val_order['dir']);
         }
 
@@ -188,46 +197,55 @@ class Datatables {
 	}
 
 	/**
-	 * This Function for Get Value Rows Filtered Data Table used
+	 * Function for Get Value Rows Filtered Data Table used
 	 * @param $table, $select, $join in function _query_select_table()
 	 * @var $rows_all > int num_rows all data
 	 * @var $filtered > int num_rows filtered data
 	 * @var $get > array for JSON of Datatables ServerSide 
 	 * @return Array
 	 */
-	public function generate($table, $select= '', $join = '', $columns, $search_columns = '', $search_custom = '')
+	public function generate($table, $select= '', $join = [], $columns, $search_columns = [], $search_custom = [], $view_custom = [])
 	{
 		$this->ci =& get_instance();
 
 		$sql = $this->ci->db;
 
-		$rows_all = $this->_get_rows_all_data($table, $select, $join);
 
-		$filtered = $this->_get_rows_filter_data($table, $select, $join, $columns, $search_columns);
-
-		$get = $this->_get_rows_filter_order_limit_data($table, $select, $join, $columns, $search_columns);
+		if(count($search_custom) > 0)
+		{
+			$rows_all = $search_custom['rows_all'];
+			$filtered = $search_custom['filtered'];
+			$get = $search_custom['get'];
+		}
+		else
+		{
+			$rows_all = $this->_get_rows_all_data($table, $select, $join);
+			$filtered = $this->_get_rows_filter_data($table, $select, $join, $columns, $search_columns);
+			$get = $this->_get_rows_filter_order_limit_data($table, $select, $join, $columns, $search_columns);
+		}
 
 		$data = [];
 
 		foreach($get as $row)
 		{
 			$dt = [];
-
+			
 			foreach($columns as $key_column => $val_column)
 			{
-				if(strpos($val_column, '.') !== FALSE)
+				$col = $this->checking_string($val_column);
+
+				if(isset($view_custom[$key_column]))
 				{
-					$cl = explode('.', $val_column);
-					$dt[$key_column] = [
-						$row[$cl[1]]
-					];
+					$result = $view_custom[$key_column]($row[$col]);
 				}
 				else
 				{
-					$dt[$key_column] = [
-						$row[$val_column]
-					];
+					$result = $row[$col];
 				}
+
+				$dt[$key_column] = [
+					$result
+				];
 			}
 
 			$data[] = $dt;
@@ -242,6 +260,24 @@ class Datatables {
 
 		];
 
-		return $json;
+		return $json;			
 	}
+
+	/**
+	 * Function for checking string column
+	 * @param string $string
+	 * @var $str as return string exploded
+	 * @return string $string
+	 */
+	private function checking_string($string)
+	{
+		if(strpos($string, '.') !== FALSE)
+		{
+			$str = explode('.', $string);
+			return $str[1];
+		}
+		
+		return $string;
+	}
+					
 }

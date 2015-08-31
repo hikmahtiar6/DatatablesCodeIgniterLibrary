@@ -1,0 +1,11 @@
+{
+	"name" : "hikmahtiar6/datatables-library-codeigniter",
+	"description" : "The CodeIgniter Libraries Datatables",
+	"license": "MIT",
+	"require": {
+		"php": ">=5.4"
+	},
+	"autoload": {
+	},
+	"minimum-stability": "dev"
+}

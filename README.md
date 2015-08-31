@@ -32,10 +32,16 @@ Example Zero Configuration
 ```
 
 ## **Version**
+####**1.1**
+ - Add filtered string on colum used
+ - Add view customize
+ - Add Composer.json
+ - Fixed bug result data generate datatables
 #### **1.0 Beta 1**
  - Cleaning SourceCode
  - Change Array assoc on columns field table
  - Generate data with search custom field table
+ - Delete function generate_with_numbering
 
 #### **0.2**
  - Generate Custom (change not included Numbering Column)
