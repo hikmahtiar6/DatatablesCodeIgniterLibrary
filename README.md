@@ -37,6 +37,7 @@ Example Zero Configuration
  - Add view customize
  - Add Composer.json
  - Fixed bug result data generate datatables
+ 
 #### **1.0 Beta 1**
  - Cleaning SourceCode
  - Change Array assoc on columns field table
