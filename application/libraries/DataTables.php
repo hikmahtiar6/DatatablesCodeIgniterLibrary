@@ -26,6 +26,25 @@ class DataTables {
      */
     protected $ci;
 
+
+    /**
+     * Request data holder.
+     *
+     * @var array
+     */
+    protected $request = [];
+
+    /**
+     * Library constructor.
+     *
+     * @return none
+     */
+    public function __construct()
+    {
+        $this->ci =& get_instance();
+        $this->request = $this->ci->get_post();
+    }
+
     /**
      * Function for GET QUERY
      *
@@ -36,8 +55,6 @@ class DataTables {
      */
     public function _query_select_table($table, $select, array $join)
     {
-        $this->ci =& get_instance();
-
         $sql = $this->ci->db;
 
         if($select == '')
@@ -65,13 +82,12 @@ class DataTables {
 
     /**
      * Function for Get value rows ALL DATA TABLE
+     *
      * @param $table, $select, $join in function _query_select_table()
      * @return int $num_rows
      */
     private function _get_rows_all_data($table, $select, $join)
     {
-        $this->ci =& get_instance();
-
         $sql = $this->ci->db;
         
         $query = $this->_query_select_table($table, $select, $join);
@@ -96,13 +112,11 @@ class DataTables {
      */
     private function _get_rows_filter_data($table, $select, $join, array $columns, array $search_columns)
     {
-        $this->ci =& get_instance();
-
         $sql = $this->ci->db;
         
         $query = $this->_query_select_table($table, $select, $join);
 
-        $request_search = $_REQUEST['search']['value'];
+        $request_search = $this->request['search']['value'];
 
         if($request_search != '')
         {
@@ -148,13 +162,11 @@ class DataTables {
      */
     private function _get_rows_filter_order_limit_data($table, $select, $join, $columns, $search_columns)
     {
-        $this->ci =& get_instance();
-
         $sql = $this->ci->db;
         
         $query = $this->_query_select_table($table, $select, $join);
 
-        $request_search = $_REQUEST['search']['value'];
+        $request_search = $this->request['search']['value'];
 
         if($request_search != '')
         {
@@ -182,14 +194,14 @@ class DataTables {
             $query = $sql->where($query_search);
         }
                 
-        $query->limit($_REQUEST['length'] , $_REQUEST['start']);
+        $query->limit($this->request['length'] , $this->request['start']);
 
-        $order_column = $_REQUEST['columns'];
-        $order_table = $_REQUEST['order'];
+        $order_column = $this->request['columns'];
+        $order_table = $this->request['order'];
 
         foreach($order_table as $val_order)
         {
-            $ordering = $_REQUEST['columns'][$val_order['column']]['data'];
+            $ordering = $this->request['columns'][$val_order['column']]['data'];
             $order__ = $columns[$ordering];
             $query->order_by($order__ , $val_order['dir']);
         }
@@ -209,10 +221,7 @@ class DataTables {
      */
     public function generate($table, $select= '', $join = [], $columns, $search_columns = [], $search_custom = [], $view_custom = [])
     {
-        $this->ci =& get_instance();
-
         $sql = $this->ci->db;
-
 
         if(count($search_custom) > 0)
         {
@@ -256,7 +265,7 @@ class DataTables {
 
         $json = [
 
-            'draw' => intval($_REQUEST['draw']),
+            'draw' => intval($this->request['draw']),
             'recordsTotal' => intval($rows_all),
             'recordsFiltered' => intval($filtered),
             'data' => $data
