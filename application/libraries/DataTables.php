@@ -3,7 +3,7 @@
  * Libraries Datatables ServerSide For CodeIgniter
  * Started August 18, 2015
  * @link https://github.com/hikmahtiar6
- * @version 1.1
+ * @version 1.2
  * @author HikmahTiar <hikmahtiar.cool@gmail.com>
  * @license MIT
  *
@@ -12,8 +12,6 @@
 /******************************
  * Facebook : Hikmah Tiar     *
  * Twitter : @hikmahtiar_     *
- * Instagram : @hikmahtiar6   *
- * Contact : 0878-7430-5327   *
  ******************************
  */
 
@@ -25,7 +23,6 @@ class DataTables {
      * @var CodeIgniter
      */
     protected $ci;
-
 
     /**
      * Request data holder.
@@ -42,7 +39,38 @@ class DataTables {
     public function __construct()
     {
         $this->ci =& get_instance();
-        $this->request = $this->ci->get_post();
+        $this->request = $this->ci->input->post() ? $this->ci->input->post() : $this->ci->input->get();
+    }
+
+    /**
+     * Function for checking string column.
+     *
+     * @param string $string
+     * @return string $string
+     */
+    private function _checking_string($string)
+    {
+        if(strpos($string, '.') !== FALSE)
+        {
+            $str = explode('.', $string);
+            return $str[1];
+        }
+        
+        return $string;
+    }
+
+    /**
+     * Function character string not allowed search
+     *
+     * @return array character
+     */
+    private function _not_allowed_char()
+    {
+        $character = [
+            ':', '=', '>', '<', '"'
+        ];
+
+        return $character;
     }
 
     /**
@@ -53,7 +81,7 @@ class DataTables {
      * @param array $join Checking > If not null , running query JOIN TABLE of $join = array()
      * @return string $query
      */
-    public function _query_select_table($table, $select, array $join)
+    public function query_select_table($table, $select, array $join)
     {
         $sql = $this->ci->db;
 
@@ -83,14 +111,14 @@ class DataTables {
     /**
      * Function for Get value rows ALL DATA TABLE
      *
-     * @param $table, $select, $join in function _query_select_table()
+     * @param $table, $select, $join in function query_select_table()
      * @return int $num_rows
      */
-    private function _get_rows_all_data($table, $select, $join)
+    private function _get_rows_all_data($table, $select, array $join)
     {
         $sql = $this->ci->db;
         
-        $query = $this->_query_select_table($table, $select, $join);
+        $query = $this->query_select_table($table, $select, $join);
 
         $get = $query->get();
 
@@ -104,25 +132,27 @@ class DataTables {
     /**
      * Function for Get Value Rows Filtered Data Table.
      *
-     * @param $table, $select, $join in function _query_select_table()
+     * @param $table, $select, $join in function query_select_table()
      * @param array $columns > variable column used
      * @param array $search_columns > if used customized search
      * @return int $filtered
      */
-    private function _get_rows_filter_data($table, $select, $join, array $columns, array $search_columns)
+    private function _get_rows_filter_data($table, $select, array $join, array $columns, array $search_columns)
     {
         $sql = $this->ci->db;
         
-        $query = $this->_query_select_table($table, $select, $join);
+        $query = $this->query_select_table($table, $select, $join);
 
-        $request_search = $this->request['search']['value'];
+        $post_search = $this->request['search']['value'];
+
+        $request_search = str_replace($this->_not_allowed_char(), '', $post_search);
 
         if($request_search != '')
         {
             $query_search = '(';
             $searching = '';
 
-            if(count($search_columns) > 0)
+            if(count($search_columns) == 0)
             {
                 foreach($columns as $key_column => $val_column)
                 {
@@ -138,8 +168,10 @@ class DataTables {
                 
             }
 
+
             $query_search .= rtrim($searching, 'OR');
             $query_search .= ')';
+
             $query = $sql->where($query_search);
         }
 
@@ -152,25 +184,27 @@ class DataTables {
     /**
      * Function for Get Value Rows Filtered Data Table used.
      *
-     * @param $table, $select, $join in function _query_select_table()
+     * @param $table, $select, $join in function query_select_table()
      * @param array $columns > variable column used
      * @param array $search_columns > if used customized search
      * @return Array
      */
-    private function _get_rows_filter_order_limit_data($table, $select, $join, $columns, $search_columns)
+    private function _get_data($table, $select, array $join, $columns, $search_columns)
     {
         $sql = $this->ci->db;
         
-        $query = $this->_query_select_table($table, $select, $join);
+        $query = $this->query_select_table($table, $select, $join);
 
-        $request_search = $this->request['search']['value'];
+        $post_search = $this->request['search']['value'];
+
+        $request_search = str_replace($this->_not_allowed_char(), '', $post_search);
 
         if($request_search != '')
         {
             $query_search = '(';
             $searching = '';
 
-            if($search_columns == '')
+            if(count($search_columns) == 0)
             {
                 foreach($columns as $key_column => $val_column)
                 {
@@ -188,6 +222,7 @@ class DataTables {
 
             $query_search .= rtrim($searching, 'OR');
             $query_search .= ')';
+
             $query = $sql->where($query_search);
         }
                 
@@ -211,7 +246,7 @@ class DataTables {
     /**
      * Function for Get Value Rows Filtered Data Table used.
      *
-     * @param $table, $select, $join in function _query_select_table()
+     * @param $table, $select, $join in function query_select_table()
      * @return Array
      */
     public function generate($table, $select= '', $join = [], $columns, $search_columns = [], $search_custom = [], $view_custom = [])
@@ -228,7 +263,7 @@ class DataTables {
         {
             $rows_all = $this->_get_rows_all_data($table, $select, $join);
             $filtered = $this->_get_rows_filter_data($table, $select, $join, $columns, $search_columns);
-            $get = $this->_get_rows_filter_order_limit_data($table, $select, $join, $columns, $search_columns);
+            $get = $this->_get_data($table, $select, $join, $columns, $search_columns);
         }
 
         $data = [];
@@ -239,7 +274,7 @@ class DataTables {
             
             foreach($columns as $key_column => $val_column)
             {
-                $col = $this->checking_string($val_column);
+                $col = $this->_checking_string($val_column);
 
                 if(isset($view_custom[$key_column]))
                 {
@@ -267,24 +302,12 @@ class DataTables {
 
         ];
 
-        return $json;            
+        $output = $this->ci->output;
+        $output->set_content_type('application/json');
+        $output->set_output(json_encode($json));
+
+        return $output;            
     }
 
-    /**
-     * Function for checking string column.
-     *
-     * @param string $string
-     * @return string $string
-     */
-    private function checking_string($string)
-    {
-        if(strpos($string, '.') !== FALSE)
-        {
-            $str = explode('.', $string);
-            return $str[1];
-        }
-        
-        return $string;
-    }
                     
 }

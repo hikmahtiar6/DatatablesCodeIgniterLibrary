@@ -15,9 +15,9 @@ Example Zero Configuration
 	    
 	    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.8/css/jquery.dataTables.css">
            
-           <script type="text/javascript" charset="utf8" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-           
-           <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.8/js/jquery.dataTables.js"></script>
+       <script type="text/javascript" charset="utf8" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+       
+       <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.8/js/jquery.dataTables.js"></script>
 
 	    <body>
 		    <table class="display cell-border" id="datatables">
@@ -28,10 +28,20 @@ Example Zero Configuration
 			    </tr>
 		    </table>
 	    </body>
+
+	    <script type="text/javascript">
+	    $(document).ready(function() {
+	    	$('#datatables').DataTable();
+	    });
+	    </script>
     </html>
 ```
 
 ## **Version**
+####**1.2**
+ - Fix Searching
+ - Output moving to generate
+
 ####**1.1**
  - Add filtered string on colum used
  - Add view customize
