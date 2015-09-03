@@ -123,8 +123,6 @@ class DataTables {
         $get = $query->get();
 
         $num_rows = $get->num_rows();
-        
-        //var_dump($query);
 
         return $num_rows;
     }
@@ -233,8 +231,17 @@ class DataTables {
 
         foreach($order_table as $val_order)
         {
-            $ordering = $this->request['columns'][$val_order['column']]['data'];
-            $order__ = $columns[$ordering];
+            $order_name = $this->request['columns'][$val_order['column']]['name'];
+            $order_data = $this->request['columns'][$val_order['column']]['data'];
+
+            if($order_name == '')
+            {
+                $order__ = $columns[$order_data];
+            }
+            else
+            {
+                $order__ = $columns[$order_name];
+            }
             $query->order_by($order__ , $val_order['dir']);
         }
 
@@ -308,6 +315,5 @@ class DataTables {
 
         return $output;            
     }
-
                     
 }
