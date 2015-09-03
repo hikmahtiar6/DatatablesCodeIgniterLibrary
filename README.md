@@ -38,6 +38,9 @@ Example Zero Configuration
 ```
 
 ## **Version**
+####**1.2.2**
+ - Add searching by name config
+
 ####**1.2**
  - Fix Searching
  - Output moving to generate

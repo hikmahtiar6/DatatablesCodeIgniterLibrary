@@ -166,7 +166,6 @@ class DataTables {
                 
             }
 
-
             $query_search .= rtrim($searching, 'OR');
             $query_search .= ')';
 
